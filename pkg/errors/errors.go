@@ -3,11 +3,8 @@ package errors
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/morikuni/failure/v2"
-	Ctx "github.com/o-ga09/ecs-express-mode-api/pkg/context"
-	"github.com/o-ga09/ecs-express-mode-api/pkg/logger"
 )
 
 const (
@@ -84,114 +81,66 @@ var (
 )
 
 // ginのcontextに認証エラーをセットして、ログ出力する
-func MakeAuthorizationError(ctx context.Context, msg string) {
+func MakeAuthorizationError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrAuthorized, ErrTypeUnAuthorized)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeUnAuthorized)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Warn(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
 // ginのcontextに認可エラーをセットして、ログ出力する
-func MakeAuthorizedError(ctx context.Context, msg string) {
+func MakeAuthorizedError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrUnauthorized, ErrTypeUnAuthorized)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeUnAuthorized)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Warn(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
 // ginのcontextにシステムエラーをセットして、ログ出力する
-func MakeSystemError(ctx context.Context, msg string) {
+func MakeSystemError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrSystem, ErrTypeCritical)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeCritical)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Error(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
-func MakeBusinessError(ctx context.Context, msg string) {
+func MakeBusinessError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrSystem, ErrTypeBussiness)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeBussiness)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Warn(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
-func MakeConflictError(ctx context.Context, msg string) {
+func MakeConflictError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrConflict, ErrTypeConflict)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeConflict)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Warn(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
-func MakeNotFoundError(ctx context.Context, msg string) {
+func MakeNotFoundError(ctx context.Context, msg string) error {
 	var wrapped error
 	if msg == "" {
 		wrapped = failure.Translate(ErrNotFound, ErrTypeNotFound)
 	} else {
 		wrapped = failure.Translate(errors.New(msg), ErrTypeNotFound)
 	}
-	c := Ctx.GetCtxGinCtx(ctx)
-	if c != nil {
-		c.Error(wrapped)
-	}
-	Ctx.SetCtxGinCtx(ctx, c)
-	stack := getCallstack(wrapped)
-	errMessage := GetMessage(wrapped)
-	logger.Warn(ctx, errMessage, callStack, stack)
-	c.Abort()
+	return wrapped
 }
 
 // エラーをラップして、返す
@@ -258,16 +207,4 @@ func GetCode(err error) ErrCode {
 		}
 	}
 	return ""
-}
-
-func getCallstack(err error) string {
-	if err == nil {
-		return ""
-	}
-	callstack := failure.CallStackOf(err)
-	msg := ""
-	for _, frame := range callstack.Frames() {
-		msg += fmt.Sprintf("%+v\n", frame)
-	}
-	return msg
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/o-ga09/ecs-express-mode-api/internal/middleware"
 	"github.com/o-ga09/ecs-express-mode-api/internal/route"
 	"github.com/o-ga09/ecs-express-mode-api/pkg/config"
 	"github.com/o-ga09/ecs-express-mode-api/pkg/logger"
@@ -29,9 +29,15 @@ func NewServer(ctx context.Context) *Server {
 func (s *Server) Run(ctx context.Context) error {
 	e := echo.New()
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	// カスタムエラーハンドラーを設定
+	e.HTTPErrorHandler = middleware.CustomErrorHandler
+
+	// ミドルウェア
+	e.Use(middleware.SetDB())
+	e.Use(middleware.RequestID())
+	e.Use(middleware.RequestLogger())
+	e.Use(middleware.CORSConfig())
+	e.Use(middleware.TimeoutConfig())
 
 	route.SetUpRouters(e)
 

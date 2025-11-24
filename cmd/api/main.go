@@ -6,6 +6,7 @@ import (
 
 	"github.com/o-ga09/ecs-express-mode-api/internal/server"
 	"github.com/o-ga09/ecs-express-mode-api/pkg/config"
+	"github.com/o-ga09/ecs-express-mode-api/pkg/logger"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 	}
 
 	// ロガーの設定
-	server.Logger(ctx)
+	logger.Logger(ctx)
 
 	srv := server.NewServer(ctx)
 	if err := srv.Run(ctx); err != nil {

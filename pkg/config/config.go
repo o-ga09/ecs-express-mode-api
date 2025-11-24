@@ -7,7 +7,6 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/caarlos0/env/v6"
-	"github.com/o-ga09/ecs-express-mode-api/pkg/errors"
 	"google.golang.org/api/option"
 )
 
@@ -31,7 +30,7 @@ type Config struct {
 func New(ctx context.Context) (context.Context, error) {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
-		return nil, errors.Wrap(ctx, err)
+		return nil, err
 	}
 
 	return context.WithValue(ctx, CtxEnvKey, cfg), nil
@@ -56,7 +55,7 @@ func GetFirebaseApp(ctx context.Context) (*firebase.App, error) {
 	}
 
 	if err != nil {
-		return nil, errors.Wrap(ctx, err)
+		return nil, err
 	}
 
 	return app, nil
