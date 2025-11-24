@@ -33,9 +33,9 @@ func (s *Server) Run(ctx context.Context) error {
 	e.HTTPErrorHandler = middleware.CustomErrorHandler
 
 	// ミドルウェア
-	e.Use(middleware.SetDB())
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLogger())
+	e.Use(middleware.SetDB())
 	e.Use(middleware.CORSConfig())
 	e.Use(middleware.TimeoutConfig())
 
