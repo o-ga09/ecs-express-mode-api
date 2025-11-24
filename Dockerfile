@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /app/api ./cmd/api
 
 # Runtime stage
-FROM alpine:latest
+FROM alpine:latest AS api
 
 WORKDIR /app
 
