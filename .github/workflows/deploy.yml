@@ -63,27 +63,8 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Download task definition
-        env:
-          TASK_DEFINITION_FAMILY: ${{ secrets.ECS_TASK_DEFINITION_FAMILY }}
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition $TASK_DEFINITION_FAMILY \
-            --query taskDefinition \
-            --region ${{ env.AWS_REGION }} > task-definition.json
-
-      - name: Update task definition with new image
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: ${{ secrets.ECS_CONTAINER_NAME }}
-          image: ${{ needs.build-and-push.outputs.image }}
-
       - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ secrets.ECS_SERVICE_NAME }}
-          cluster: ${{ secrets.ECS_CLUSTER_NAME }}
-          wait-for-service-stability: true
+        run: |
+          aws ecs update-express-gateway-service \
+            --service-arn arn:aws:ecs:{{ env.AWS_REGION}}:{{ secrets.AWS_ACCOUNT_ID }}:service/{{ secrets.ECS_CLUSTER_NAME }}/{{ secrets.ECS_SERVICE_NAME }} \
+            --primary-container '{"image": "'${{ needs.build-and-push.outputs.image }}'"}'
