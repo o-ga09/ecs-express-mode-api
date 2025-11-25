@@ -67,4 +67,4 @@ jobs:
         run: |
           aws ecs update-express-gateway-service \
             --service-arn ${{ secrets.AWS_ECS_ARN }} \
-            --primary-container '{"image": "'${{ needs.build-and-push.outputs.image }}'"}'
+            --primary-container '{"image": "${{ needs.build-and-push.outputs.image }}"}'
