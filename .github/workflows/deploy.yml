@@ -66,5 +66,5 @@ jobs:
       - name: Deploy to ECS
         run: |
           aws ecs update-express-gateway-service \
-            --service-arn arn:aws:ecs:{{ env.AWS_REGION}}:{{ secrets.AWS_ACCOUNT_ID }}:service/{{ secrets.ECS_CLUSTER_NAME }}/{{ secrets.ECS_SERVICE_NAME }} \
+            --service-arn ${{ secrets.AWS_ECS_ARN }} \
             --primary-container '{"image": "'${{ needs.build-and-push.outputs.image }}'"}'
